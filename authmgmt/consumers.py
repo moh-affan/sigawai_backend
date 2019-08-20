@@ -41,6 +41,9 @@ from .serializers import UserSerializer
 class UserApiConsumer(mixins.ListModelMixin,
                       SubscribeModelMixin,
                       GenericAsyncBroadcastAPIConsumer):
-    queryset = User.get_menu()
+    queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)

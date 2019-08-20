@@ -1,19 +1,19 @@
-from basicauth.decorators import basic_auth_required
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.utils.decorators import method_decorator
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.generics import ListAPIView
+from rest_framework.authtoken.models import Token
 
 from .serializers import UserSerializer
 
 
 class LoginApiView(APIView):
-    authentication_classes = []
-    permission_classes = []
+    authentication_classes = ()
+    permission_classes = ()
 
-    @method_decorator(basic_auth_required, name='post')
     def post(self, request, format=None):
 
         user = authenticate(
@@ -28,7 +28,10 @@ class LoginApiView(APIView):
                     data=request.data,
                     context={'request': request})
                 if serializer.is_valid():
-                    return Response(serializer.data, status=status.HTTP_200_OK)
+                    token = Token.objects.get_or_create(user=user)[0]
+                    data = serializer.data
+                    data['token'] = token.key
+                    return Response(data, status=status.HTTP_200_OK)
                 else:
                     return Response(serializer.errors,
                                     status=status.HTTP_400_BAD_REQUEST)
@@ -41,9 +44,13 @@ class LoginApiView(APIView):
                              'message': "Username atau password Anda salah"},
                             status=status.HTTP_401_UNAUTHORIZED)
 
-    @method_decorator(basic_auth_required, name='delete')
     def delete(self, request, format=None):
         logout(request)
         request.session.flush()
         return Response({'success': True, 'message': "Berhasil logout"},
                         status=status.HTTP_200_OK)
+
+
+class UserApiView(ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer

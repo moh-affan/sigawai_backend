@@ -34,14 +34,17 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 INSTALLED_APPS = [
     'channels',
     'channels_redis',
+    'corsheaders',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'corsheaders',
+
     'rest_framework',
+    'rest_framework.authtoken',
     'rest_framework_simplejwt',
     'djangochannelsrestframework',
 
@@ -53,6 +56,9 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    # CORS
+    'corsheaders.middleware.CorsMiddleware',
+
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -79,6 +85,18 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'sigawai_backend.wsgi.application'
+
+# CHANNELS
+ASGI_APPLICATION = 'sigawai_backend.routing.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
 
 
 # Database
