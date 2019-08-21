@@ -11,7 +11,7 @@ JENIS_RUANG = (('a', 'a'), ('b', 'b'), ('c', 'c'), ('d', 'd'))
 class Jabatan(models.Model):
     jabatan = models.CharField(max_length=20)
     is_struktural = models.BooleanField(default=False)
-    kelas_jabatan = models.PositiveIntegerField(max_length=15)
+    kelas_jabatan = models.PositiveIntegerField()
     eselon = models.CharField(max_length=4)
 
     def __str__(self):
@@ -20,8 +20,8 @@ class Jabatan(models.Model):
 
 class Pangkat(models.Model):
     pangkat = models.CharField(max_length=20)
-    golongan = models.CharField(choices=JENIS_GOLONGAN)
-    ruang = models.CharField(choices=JENIS_RUANG)
+    golongan = models.CharField(choices=JENIS_GOLONGAN, max_length=50)
+    ruang = models.CharField(choices=JENIS_RUANG, max_length=50)
 
     def __str__(self):
         return "{ '{}':'{}' }".format(self.pk, self.pangkat)
@@ -49,7 +49,7 @@ class ASN(models.Model):
 class RiwayatJabatan(models.Model):
     asn = models.ForeignKey(ASN, on_delete=models.CASCADE, related_name='riwayat_jabatan')
     tmt = models.DateField()
-    jabatan = models.ForeignKey(Jabatan, on_delete=models.SET_NULL, related_name='riwayat_jabatan')
+    jabatan = models.ForeignKey(Jabatan, on_delete=models.SET_NULL, related_name='riwayat', null=True)
     no_sk = models.CharField(max_length=50)
     tgl_sk = models.DateField()
     nama_pejabat = models.CharField(max_length=50)
@@ -64,9 +64,9 @@ class RiwayatJabatan(models.Model):
 
 
 class RiwayatPangkat(models.Model):
-    asn = models.ForeignKey(ASN, on_delete=models.CASCADE, related_name='riwayat_jabatan')
+    asn = models.ForeignKey(ASN, on_delete=models.CASCADE, related_name='riwayat_pangkat')
     tmt = models.DateField()
-    pangkat = models.ForeignKey(Pangkat, on_delete=models.SET_NULL, related_name='riwayat_pangkat')
+    pangkat = models.ForeignKey(Pangkat, on_delete=models.SET_NULL, related_name='riwayat', null=True)
     no_sk = models.CharField(max_length=50)
     tgl_sk = models.DateField()
     nama_pejabat = models.CharField(max_length=50)

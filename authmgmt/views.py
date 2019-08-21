@@ -47,7 +47,8 @@ class LoginApiView(APIView):
     def delete(self, request, format=None):
         logout(request)
         request.session.flush()
-        token = Token.objects.get(key=request.data['token'])
+        token = request.headers['Authorization']
+        token = Token.objects.get(key=token)
         if token:
             token.delete()
         return Response({'success': True, 'message': "Berhasil logout"},
